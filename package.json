@@ -1,7 +1,7 @@
 {
   "name": "fitbit-parallax",
   "description": "Parallax Engine that reacts to the orientation of your Fitbit device.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "main": "parallax.js",
   "homepage": "https://github.com/gregoiresage/parallax",

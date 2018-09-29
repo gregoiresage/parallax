@@ -28,7 +28,7 @@ You will then find the source code in `node_modules/fitbit-parallax/parallax.js`
 
 ### Include the Script
 
-`import Parallax from 'fitbit-parallax'`
+`import { Parallax } from 'fitbit-parallax'`
 
 ### Create your SVG elements
 

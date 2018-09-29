@@ -1,8 +1,6 @@
 ![Parallax.js](logo.png)
 
-[![CDNJS](https://img.shields.io/cdnjs/v/parallax.svg)](https://cdnjs.com/libraries/parallax)
-
-Parallax Engine that reacts to the orientation of a your Fitbit device.
+This library is just a port of the awesome [parallax.js](https://github.com/wagerfield/parallax) library for Fibit OS.  
 
 # Table of Contents
 
@@ -22,15 +20,15 @@ Parallax Engine that reacts to the orientation of a your Fitbit device.
 
 ## 1.1 Installation
 
-`npm i -s parallax-js`
+`npm i -s fitbit-parallax`
 
-You will then find the source code in `node_modules/parallax-js/src/parallax.js` and the browserified, babelified, uglified, production-ready version in `node_modules/parallax-js/dist/parallax.min.js`
+You will then find the source code in `node_modules/fitbit-parallax/parallax.js`
 
 ## 1.2 Preparations
 
 ### Include the Script
 
-`import Parallax from 'parallax-js'`
+`import Parallax from 'fitbit-parallax'`
 
 ### Create your SVG elements
 
@@ -66,6 +64,7 @@ As soon as your app is loaded, you can create a new Parallax.js instance, provid
 ```javascript
 var scene = document.getElementById('scene');
 var parallaxInstance = new Parallax(scene);
+parallaxInstance.enable()
 ```
 
 That's it, you're running Parallax.js now!
@@ -82,8 +81,9 @@ Programmatic:
 ```javascript
 var scene = document.getElementById('scene');
 var parallaxInstance = new Parallax(scene, {
-  relativeInput: true
+  calibrationDelay: 1000
 });
+parallaxInstance.enable()
 ```
 
 Using Methods at Runtime:
@@ -170,5 +170,5 @@ This project is licensed under the terms of the  [MIT](http://www.opensource.org
 ## 5.2 Authors
 
 Matthew Wagerfield: [@wagerfield](http://twitter.com/wagerfield)  
-René Roth: [Website](http://reneroth.org/)
+René Roth: [Website](http://reneroth.org/)  
 Grégoire Sage : Modification for Fitbit OS

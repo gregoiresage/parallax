@@ -5,17 +5,15 @@
 *              driving the motion from the gyroscope output of a smartdevice.
 */
 
-import objectAssign from 'object-assign'
-import { OrientationSensor } from "orientation";
+import { OrientationSensor } from 'orientation'
+import { display } from 'display'
 
 const helpers = {
-
   clamp(value, min, max) {
     return min < max
       ? (value < min ? min : value > max ? max : value)
       : (value < max ? max : value > min ? min : value)
   }
-
 }
 
 const MAGIC_NUMBER = 30,
@@ -39,11 +37,17 @@ export class Parallax {
 
     this.element = element
 
-    objectAssign(this, DEFAULTS, options)
+    for (var key in DEFAULTS) {
+      this[key] = DEFAULTS[key]
+    }
+    for (var key in options) {
+      this[key] = options[key]
+    }
 
     this.calibrationTimer = null
     this.calibrationFlag = true
     this.enabled = false
+    this.wasenabled = false
     this.raf = null
 
     this.elementWidth = 0
@@ -64,8 +68,11 @@ export class Parallax {
     this.onAnimationFrame = this.onAnimationFrame.bind(this)
     this.onOrientationSensor = this.onOrientationSensor.bind(this)
     this.onCalibrationTimer = this.onCalibrationTimer.bind(this)
+    this.onDisplayChanged = this.onDisplayChanged.bind(this)
 
     this.initialise()
+
+    display.addEventListener('change', this.onDisplayChanged)
   }
 
   initialise() {
@@ -221,7 +228,21 @@ export class Parallax {
     pitch = pitch * 180.0 / Math.PI;
 
     this.rotate(pitch, roll)
- }
+  }
+
+  onDisplayChanged() {
+    if(display.on) {
+      if(this.wasenabled) {
+        this.enable()
+      }
+    } 
+    else {
+      this.wasenabled = this.enabled
+      if(this.enabled) {
+        this.disable()
+      }
+    }
+  }
 
   destroy() {
     this.disable()

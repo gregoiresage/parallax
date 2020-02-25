@@ -5,7 +5,7 @@
 *              driving the motion from the gyroscope output of a smartdevice.
 */
 
-import { OrientationSensor } from 'orientation'
+import { Accelerometer } from "accelerometer"
 import { display } from 'display'
 
 const helpers = {
@@ -16,21 +16,20 @@ const helpers = {
   }
 }
 
-const MAGIC_NUMBER = 30,
-      DEFAULTS = {
-        calibrationThreshold: 100,
-        calibrationDelay: 500,
-        calibrateX: false,
-        calibrateY: true,
-        invertX: true,
-        invertY: true,
-        limitX: false,
-        limitY: false,
-        scalarX: 10.0,
-        scalarY: 10.0,
-        frictionX: 0.1,
-        frictionY: 0.1
-      }
+const DEFAULTS = {
+  calibrationThreshold: 100,
+  calibrationDelay: 500,
+  calibrateX: false,
+  calibrateY: true,
+  invertX: true,
+  invertY: true,
+  limitX: false,
+  limitY: false,
+  scalarX: 10.0,
+  scalarY: 10.0,
+  frictionX: 0.1,
+  frictionY: 0.1
+}
 
 export class Parallax {
   constructor(element, options) {
@@ -66,7 +65,7 @@ export class Parallax {
     this.velocityY = 0
 
     this.onAnimationFrame = this.onAnimationFrame.bind(this)
-    this.onOrientationSensor = this.onOrientationSensor.bind(this)
+    this.onAccelerometerSensor = this.onAccelerometerSensor.bind(this)
     this.onCalibrationTimer = this.onCalibrationTimer.bind(this)
     this.onDisplayChanged = this.onDisplayChanged.bind(this)
 
@@ -83,15 +82,15 @@ export class Parallax {
   }
 
   updateLayers() {
-    if(!this.element.firstChild) {
-      console.warn('ParallaxJS: Your scene does not have any layers.')
-    }
+    // if(!this.element.firstChild) {
+    //   console.warn('ParallaxJS: Your scene does not have any layers.')
+    // }
 
     this.layers = []
     this.depths = []
 
     let layer = this.element.firstChild
-    while(layer) {
+    while (layer) {
       this.layers.push(layer)
       this.depths.push(layer.layer / 100 || 0)
       layer = layer.nextSibling
@@ -114,9 +113,9 @@ export class Parallax {
     }
     this.enabled = true
 
-    this.sensor = new OrientationSensor({ frequency: 10 })
-    this.sensor.onreading = this.onOrientationSensor
-    this.detectionTimer = setTimeout(this.onOrientationTimer, this.supportDelay)
+    this.sensor = new Accelerometer({ frequency: 10 })
+    this.sensor.onreading = this.onAccelerometerSensor
+    this.detectionTimer = setTimeout(this.onAccelerometerTimer, this.supportDelay)
 
     this.raf = requestAnimationFrame(this.onAnimationFrame)
     this.sensor.start()
@@ -197,10 +196,9 @@ export class Parallax {
     this.raf = requestAnimationFrame(this.onAnimationFrame)
   }
 
-  rotate(beta, gamma){
-    // Extract Rotation
-    let x = (beta  || 0) / MAGIC_NUMBER, //  -90 :: 90
-        y = (gamma || 0) / MAGIC_NUMBER  // -180 :: 180
+  onAccelerometerSensor() {
+    const x = this.sensor.x
+    const y = -this.sensor.y
 
     if (this.calibrationFlag) {
       this.calibrationFlag = false
@@ -212,31 +210,12 @@ export class Parallax {
     this.inputY = y
   }
 
-  onOrientationSensor() {
-    const qw = this.sensor.quaternion[0];
-    const qx = this.sensor.quaternion[1];
-    const qy = this.sensor.quaternion[2];
-    const qz = this.sensor.quaternion[3];
-    
-    let y = 2.0 * (qw * qx + qy * qz);
-    let x = 1.0 - 2.0 * (qx * qx + qy * qy);
-    
-    let roll = Math.atan2(y, x);
-    roll = (roll * 180.0 / Math.PI + 360 ) % 360;
-    
-    let pitch = Math.asin(Math.max(-1.0, Math.min(1.0, 2.0 * (qw * qy - qz * qx))));
-    pitch = pitch * 180.0 / Math.PI;
-
-    this.rotate(pitch, roll)
-  }
-
   onDisplayChanged() {
-    if(display.on) {
+    if (display.on) {
       if(this.wasenabled) {
         this.enable()
       }
-    } 
-    else {
+    } else {
       this.wasenabled = this.enabled
       if(this.enabled) {
         this.disable()
